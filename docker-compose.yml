@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  Cloud2020-88739:
+    image: postgres:11
+    restart: always
+    command: -p 3306
+    expose:
+      - 3306
+    env_file:
+      - database.env
+    networks:
+      Bridge_Zadanie_1:
+        ipv4_address: 10.0.10.3
+  web:
+    image: kuzxnia/lab9:latest
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    restart: on-failure
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - Cloud2020-88739
+    networks:
+      - Bridge_Zadanie_1
+
+networks:
+  Bridge_Zadanie_1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.10.0/24
